@@ -31,6 +31,7 @@ interface FeedItem {
   price: string;
   originalPrice: string;
   participantsCount: number;
+  totalNeeded: number;
   status: 'PENDING' | 'FINISHED';
   buttonText: string;
 }
@@ -72,6 +73,7 @@ const FEED_ITEMS: FeedItem[] = [
     price: '免单',
     originalPrice: '¥29.9',
     participantsCount: 50,
+    totalNeeded: 100,
     status: 'PENDING',
     buttonText: '许愿'
   },
@@ -87,6 +89,7 @@ const FEED_ITEMS: FeedItem[] = [
     price: '免单',
     originalPrice: '¥12.5',
     participantsCount: 120,
+    totalNeeded: 150,
     status: 'PENDING',
     buttonText: '许愿'
   },
@@ -101,7 +104,8 @@ const FEED_ITEMS: FeedItem[] = [
     tags: ['50人已中奖', '免单 售价¥34.6'],
     price: '免单',
     originalPrice: '¥34.6',
-    participantsCount: 200,
+    participantsCount: 180,
+    totalNeeded: 200,
     status: 'PENDING',
     buttonText: '许愿'
   },
@@ -435,7 +439,9 @@ const FeedList = () => {
 
       {/* List */}
       <div className="px-4 space-y-4 pb-24">
-         {FEED_ITEMS.map(item => (
+         {FEED_ITEMS.map(item => {
+           const percent = Math.floor((item.participantsCount / item.totalNeeded) * 100);
+           return (
            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm flex items-start space-x-4">
               {/* Image */}
               <div className="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden relative">
@@ -451,8 +457,8 @@ const FeedList = () => {
                  </div>
                  <h4 className="font-bold text-gray-900 mb-2">{item.title}</h4>
                  
-                 {/* Progress-like tags */}
-                 <div className="flex flex-wrap gap-2 mb-3">
+                 {/* Tags */}
+                 <div className="flex flex-wrap gap-2 mb-2">
                    {item.tags.map((tag, i) => (
                      <span key={i} className="text-[10px] px-2 py-0.5 rounded bg-orange-50 text-orange-600 border border-orange-100">
                        {tag}
@@ -460,26 +466,36 @@ const FeedList = () => {
                    ))}
                  </div>
 
-                 <div className="flex items-end justify-between">
-                    <div>
-                       <span className="text-red-500 font-bold text-sm">{item.price}</span>
-                       <span className="text-gray-400 text-xs line-through ml-1">{item.originalPrice}</span>
-                    </div>
-                    <div className="text-xs text-red-500 font-bold">
-                       进度50% / 还差5人
+                 {/* Price Row */}
+                 <div className="flex items-end mb-2">
+                    <span className="text-red-500 font-bold text-sm">{item.price}</span>
+                    <span className="text-gray-400 text-xs line-through ml-1">{item.originalPrice}</span>
+                 </div>
+
+                 {/* Progress Bar Row */}
+                 <div className="flex items-center justify-between">
+                    <div className="flex-1 mr-4">
+                      <div className="flex justify-between text-[10px] text-red-500 font-bold mb-1">
+                         <span>进度{percent}%</span>
+                         <span>还差{item.totalNeeded - item.participantsCount}人</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-red-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-red-400 to-red-600 rounded-full" style={{ width: `${percent}%` }}></div>
+                      </div>
                     </div>
                  </div>
               </div>
 
-              {/* Action Button */}
-              <div className="self-center">
-                 <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-red-200 active:scale-95 transition-transform">
+              {/* Action Button (aligned bottom) */}
+              <div className="self-end pb-1">
+                 <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-red-200 active:scale-95 transition-transform whitespace-nowrap">
                    {item.buttonText}
                  </button>
                  <div className="text-[10px] text-gray-400 text-center mt-1">{item.distance}</div>
               </div>
            </div>
-         ))}
+           );
+         })}
       </div>
     </div>
   );
@@ -501,7 +517,7 @@ const App = () => {
         <div className="absolute inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"></div>
       )}
 
-      {/* Actual Home Page Content (Rendered underneath modals to give context if needed, or just replace) */}
+      {/* Actual Home Page Content */}
       <div className={`transition-all duration-500 ${stage !== 'HOME' ? 'scale-95 opacity-50 overflow-hidden h-screen' : 'opacity-100'}`}>
          <HomeHeader />
          <GridMenu />
@@ -527,13 +543,18 @@ const App = () => {
         <SuccessModal onComplete={() => setStage('HOME')} />
       )}
 
-      {/* Floating Action Button (Daily Check-in) on Home */}
+      {/* Floating Touch Button (Daily One Touch) */}
       {stage === 'HOME' && (
-        <div className="fixed bottom-24 right-4 z-30 animate-bounce">
-           <button className="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-500 rounded-full shadow-lg border-2 border-white flex flex-col items-center justify-center text-white">
-              <i className="fa-solid fa-calendar-check mb-0.5"></i>
-              <span className="text-[9px] font-bold">签到</span>
-           </button>
+        <div className="fixed bottom-24 right-2 z-30 animate-float">
+           <div className="relative">
+             <button className="w-16 h-16 bg-gradient-to-b from-gray-800 to-black rounded-2xl shadow-xl border border-gray-700 flex flex-col items-center justify-center text-white transform rotate-12 hover:rotate-0 transition-transform duration-300 group">
+                <i className="fa-solid fa-nfc-symbol text-2xl text-amber-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                <span className="text-[8px] font-bold text-amber-500">碰一碰</span>
+             </button>
+             <div className="absolute -top-2 -right-1 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold border border-white animate-pulse">
+               领红包
+             </div>
+           </div>
         </div>
       )}
     </div>
