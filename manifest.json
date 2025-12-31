@@ -1,9 +1,9 @@
 {
-  "name": "Amber PASS",
-  "short_name": "AmberPASS",
+  "name": "Amber 通行证",
+  "short_name": "Amber通行证",
   "start_url": "/",
   "display": "standalone",
-  "background_color":="#1F2937",
+  "background_color": "#1F2937",
   "theme_color": "#F59E0B",
   "icons": [
     {
