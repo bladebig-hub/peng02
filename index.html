@@ -23,14 +23,33 @@
           scrollbar-width: none;
       }
       /* Custom Animations */
-      @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
+      @keyframes zoomIn {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
       }
-      .animate-float {
-        animation: float 3s ease-in-out infinite;
+      .animate-zoomIn {
+        animation: zoomIn 0.3s ease-out forwards;
       }
+       @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+      @keyframes bounceIn {
+         0% { opacity: 0; transform: scale(0.3); }
+         50% { opacity: 1; transform: scale(1.05); }
+         70% { transform: scale(0.9); }
+         100% { transform: scale(1); }
+      }
+      .animate-bounceIn {
+         animation: bounceIn 0.5s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+      }
+
+      /* Simple jagged edge/punch hole effect via masking is complex in pure CSS without SVG, 
+         using the circle div overlay method in React component is often more reliable for ticket look */
+      
     </style>
   <script type="importmap">
 {
